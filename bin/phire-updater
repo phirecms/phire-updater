@@ -3,7 +3,10 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$json = [
+// Init
+$modules = json_decode(file_get_contents(__DIR__ . '/../data/modules.json'), true);
+$headers = ['User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:40.0) Gecko/20100101 Firefox/40.0'];
+$json    = [
     'phirecms' => null,
     'modules'  => []
 ];
@@ -11,23 +14,17 @@ $json = [
 // Get latest phirecms
 echo 'Fetching: phirecms/phirecms' . PHP_EOL;
 $curl = new Pop\Http\Client\Curl('https://api.github.com/repos/phirecms/phirecms/releases/latest', [
-    CURLOPT_HTTPHEADER => [
-        'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:40.0) Gecko/20100101 Firefox/40.0'
-    ]
+    CURLOPT_HTTPHEADER => $headers
 ]);
 $curl->send();
 $body = json_decode($curl->getBody(), true);
 $json['phirecms'] = $body['tag_name'];
 
 // Get latest modules
-$modules = json_decode(file_get_contents(__DIR__ . '/../data/modules.json'), true);
-
 foreach ($modules as $module) {
     echo 'Fetching: phirecms/' . $module . '...';
     $curl = new Pop\Http\Client\Curl('https://api.github.com/repos/phirecms/' . $module . '/releases/latest', [
-        CURLOPT_HTTPHEADER => [
-            'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:40.0) Gecko/20100101 Firefox/40.0'
-        ]
+        CURLOPT_HTTPHEADER => $headers
     ]);
     $curl->send();
     $body = json_decode($curl->getBody(), true);
@@ -44,6 +41,10 @@ foreach ($modules as $module) {
     echo ' Complete.' . PHP_EOL;
 }
 
+// Write updates.json file
+if (file_exists(__DIR__ . '/../data/updates.json')) {
+    unlink(__DIR__ . '/../data/updates.json');
+}
 file_put_contents(__DIR__ . '/../data/updates.json', json_encode($json, JSON_PRETTY_PRINT));
 echo 'Done!' . PHP_EOL;
 
