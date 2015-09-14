@@ -80,7 +80,8 @@ class IndexController extends AbstractController
     private function isValidRequest()
     {
         $result = false;
-        if ((null !== $this->request->getHeader('Authorization')) && (null !== $this->request->getHeader('User-Agent'))) {
+        if ((null !== $this->request->getHeader('Authorization')) &&
+            (null !== $this->request->getHeader('User-Agent'))) {
             $token = base64_decode($this->request->getHeader('Authorization'));
             $ua    = $this->request->getHeader('User-Agent');
             if (stripos($ua, 'curl') === false) {
