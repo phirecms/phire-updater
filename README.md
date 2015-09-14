@@ -1,2 +1,4 @@
-# phire-updater
+Phire Updater Application
+=========================
+
 Phire Updater Application
