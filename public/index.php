@@ -4,9 +4,14 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 $pop = new Popcorn\Pop();
 
-$pop->post('/', [
+$pop->get('/', [
     'controller' => 'Phire\Updater\Controller\IndexController',
     'action'     => 'index'
+]);
+
+$pop->get('/latest/:resource', [
+    'controller' => 'Phire\Updater\Controller\IndexController',
+    'action'     => 'latest'
 ]);
 
 $pop->post('/fetch', [
@@ -14,7 +19,7 @@ $pop->post('/fetch', [
     'action'     => 'fetch'
 ]);
 
-$pop->addRoutes('get,post', '*', [
+$pop->get('*', [
     'controller' => 'Phire\Updater\Controller\IndexController',
     'action'     => 'error'
 ]);

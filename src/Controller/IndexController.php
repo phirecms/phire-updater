@@ -25,24 +25,37 @@ class IndexController extends AbstractController
     public function index()
     {
         if ($this->isValidRequest()) {
-            $updates = file_get_contents(__DIR__ . '/../../data/updates.json');
-            $json    = json_decode($updates, true);
-            if (null !== $this->request->getPost('phire')) {
-                $this->response->setBody(json_encode(['version' => $json['phire']['latest']], JSON_PRETTY_PRINT));
-                $this->response->send();
-            } else if (null !== $this->request->getPost('module')) {
-                $module = $this->request->getPost('module');
-                if (isset($json['modules'][$module])) {
-                    $this->response->setBody(json_encode(['version' => $json['modules'][$module]['latest']], JSON_PRETTY_PRINT));
-                    $this->response->send();
-                } else {
-                    $this->response->setBody(json_encode(['error' => 'Module not found.'], JSON_PRETTY_PRINT));
-                    $this->response->send(404);
-                }
-            } else {
-                $this->response->setBody($updates);
-                $this->response->send();
+            $this->response->setBody(file_get_contents(__DIR__ . '/../../data/updates.json'));
+            $this->response->send();
+        } else {
+            $this->error();
+        }
+    }
+
+    public function latest($resource)
+    {
+        if ($this->isValidRequest()) {
+            $updates = json_decode(file_get_contents(__DIR__ . '/../../data/updates.json'), true);
+            $json    = [];
+            $code    = 200;
+
+            switch ($resource) {
+                case 'phirecms':
+                    $json['resource'] = $resource;
+                    $json['version']  = $updates['phirecms'];
+                    break;
+                default:
+                    if (isset($updates['modules'][$resource])) {
+                        $json['resource'] = $resource;
+                        $json['version']  = $updates['modules'][$resource];
+                    } else {
+                        $json['error'] = 'Resource not found.';
+                        $code = 404;
+                    }
             }
+
+            $this->response->setBody(json_encode($json, JSON_PRETTY_PRINT));
+            $this->response->send($code);
         } else {
             $this->error();
         }
