@@ -1,0 +1,22 @@
+{
+    "phire" : {
+        "latest"   : "2.0.0rc1",
+        "releases" : [
+            "2.0.0rc1"
+        ]
+    },
+    "modules" : {
+        "phire-content" : {
+            "latest"   : "1.0",
+            "releases" : [
+                "1.0"
+            ]
+        },
+        "phire-media" : {
+            "latest"   : "1.0",
+            "releases" : [
+                "1.0"
+            ]
+        }
+    }
+}

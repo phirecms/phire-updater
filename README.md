@@ -1,4 +1,4 @@
-Phire Updater Application
-=========================
+Phire CMS Updater Application
+=============================
 
-Phire Updater Application
+Phire CMS Updater Application
