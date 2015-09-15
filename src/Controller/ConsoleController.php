@@ -22,7 +22,7 @@ class ConsoleController extends AbstractController
     protected $modules = [];
 
     /**
-     * Current versions
+     * Current version data
      * @var array
      */
     protected $current = [
@@ -68,8 +68,10 @@ class ConsoleController extends AbstractController
 
     public function index()
     {
-        echo PHP_EOL;
-        echo '    Fetching: ' . $this->console->colorize('phirecms/phirecms', Console::BOLD_CYAN) . '...';
+        $this->console->write();
+        $this->console->write(
+            '    Fetching: ' . $this->console->colorize('phirecms/phirecms', Console::BOLD_CYAN) . '...', false
+        );
 
         // Get latest version of phirecms
         $curl = new Curl($this->urls['phirecms'], $this->options);
@@ -78,15 +80,18 @@ class ConsoleController extends AbstractController
         if ($curl->getCode() == 200) {
             $body = json_decode($curl->getBody(), true);
             $this->json['phirecms'] = (isset($body['tag_name'])) ? $body['tag_name'] : $this->current['phirecms'];
-            echo PHP_EOL;
+            $this->console->write();
         } else {
-            echo ' ' . $this->console->colorize('Error', Console::BOLD_RED) . '.' . PHP_EOL;
+            $this->console->write(' ' . $this->console->colorize('Error', Console::BOLD_RED) . '.');
         }
 
         // Get latest versions of modules
         foreach ($this->modules as $module) {
             // Get version
-            echo '    Fetching: ' . $this->console->colorize($module, Console::BOLD_CYAN) . '...';
+            $this->console->write(
+                '    Fetching: ' . $this->console->colorize($module, Console::BOLD_CYAN) . '...', false
+            );
+
             $url  = str_replace('[{module}]', $module, $this->urls['module']);
             $curl = new Curl($url, $this->options);
             $curl->send();
@@ -98,7 +103,7 @@ class ConsoleController extends AbstractController
                 // Get file
                 if (!isset($this->current['modules'][$module]) || (isset($this->current['modules'][$module]) &&
                     (version_compare($this->current['modules'][$module], $this->json['modules'][$module]) < 0))) {
-                    echo ' Downloading...';
+                    $this->console->write(' Downloading...', false);
 
                     if (file_exists(__DIR__ . '/../../public/releases/modules/' . $module . '.zip')) {
                         unlink(__DIR__ . '/../../public/releases/modules/' . $module . '.zip');
@@ -110,9 +115,9 @@ class ConsoleController extends AbstractController
                     );
                 }
 
-                echo ' Complete.' . PHP_EOL;
+                $this->console->write(' Complete.');
             } else {
-                echo ' ' . $this->console->colorize('Error', Console::BOLD_RED) . '.' . PHP_EOL;
+                $this->console->write(' ' . $this->console->colorize('Error', Console::BOLD_RED) . '.');
             }
         }
 
@@ -122,7 +127,9 @@ class ConsoleController extends AbstractController
         }
         file_put_contents(__DIR__ . '/../../data/updates.json', json_encode($this->json, JSON_PRETTY_PRINT));
 
-        echo PHP_EOL . '    Done!' . PHP_EOL . PHP_EOL;
+        $this->console->write();
+        $this->console->write('    Done!');
+        $this->console->write();
     }
 
 }
