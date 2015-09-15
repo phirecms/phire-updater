@@ -25,14 +25,17 @@ class ConsoleController extends AbstractController
      * Current versions
      * @var array
      */
-    protected $current = [];
+    protected $current = [
+        'phirecms' => '',
+        'modules'  => []
+    ];
 
     /**
      * JSON data
      * @var array
      */
     protected $json = [
-        'phirecms' => null,
+        'phirecms' => '',
         'modules'  => []
     ];
 
@@ -57,8 +60,10 @@ class ConsoleController extends AbstractController
     public function __construct()
     {
         $this->console = new Console();
-        $this->current = json_decode(file_get_contents(__DIR__ . '/../../data/updates.json'), true);
         $this->modules = json_decode(file_get_contents(__DIR__ . '/../../data/modules.json'), true);
+        if (file_exists(__DIR__ . '/../../data/updates.json')) {
+            $this->current = json_decode(file_get_contents(__DIR__ . '/../../data/updates.json'), true);
+        }
     }
 
     public function index()
@@ -91,8 +96,8 @@ class ConsoleController extends AbstractController
                 $this->json['modules'][$module] = (isset($body['tag_name'])) ? $body['tag_name'] : '';
 
                 // Get file
-                if (isset($this->current['modules'][$module]) &&
-                    (version_compare($this->current['modules'][$module], $this->json['modules'][$module]) < 0)) {
+                if (!isset($this->current['modules'][$module]) || (isset($this->current['modules'][$module]) &&
+                    (version_compare($this->current['modules'][$module], $this->json['modules'][$module]) < 0))) {
                     echo ' Downloading...';
 
                     if (file_exists(__DIR__ . '/../../public/releases/modules/' . $module . '.zip')) {
