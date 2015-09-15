@@ -3,48 +3,13 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-// Init
-$modules = json_decode(file_get_contents(__DIR__ . '/../data/modules.json'), true);
-$headers = ['User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:40.0) Gecko/20100101 Firefox/40.0'];
-$json    = [
-    'phirecms' => null,
-    'modules'  => []
-];
-
-// Get latest phirecms
-echo 'Fetching: phirecms/phirecms' . PHP_EOL;
-$curl = new Pop\Http\Client\Curl('https://api.github.com/repos/phirecms/phirecms/releases/latest', [
-    CURLOPT_HTTPHEADER => $headers
+$pop = new Pop\Application([
+    'routes' => [
+        '*' => [
+            'controller' => 'Phire\Updater\Controller\ConsoleController',
+            'action'     => 'index'
+        ]
+    ]
 ]);
-$curl->send();
-$body = json_decode($curl->getBody(), true);
-$json['phirecms'] = $body['tag_name'];
 
-// Get latest modules
-foreach ($modules as $module) {
-    echo 'Fetching: phirecms/' . $module . '...';
-    $curl = new Pop\Http\Client\Curl('https://api.github.com/repos/phirecms/' . $module . '/releases/latest', [
-        CURLOPT_HTTPHEADER => $headers
-    ]);
-    $curl->send();
-    $body = json_decode($curl->getBody(), true);
-    $json['modules'][$module] = $body['tag_name'];
-
-    echo ' Downloading...';
-    if (file_exists(__DIR__ . '/../public/releases/modules/'. $module . '.zip')) {
-        unlink(__DIR__ . '/../public/releases/modules/'. $module . '.zip');
-    }
-    file_put_contents(
-        __DIR__ . '/../public/releases/modules/'. $module . '.zip',
-        file_get_contents('https://github.com/phirecms/' . $module .'/blob/master/' . $module . '.zip?raw=true')
-    );
-    echo ' Complete.' . PHP_EOL;
-}
-
-// Write updates.json file
-if (file_exists(__DIR__ . '/../data/updates.json')) {
-    unlink(__DIR__ . '/../data/updates.json');
-}
-file_put_contents(__DIR__ . '/../data/updates.json', json_encode($json, JSON_PRETTY_PRINT));
-echo 'Done!' . PHP_EOL;
-
+$pop->run();

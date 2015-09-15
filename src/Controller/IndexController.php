@@ -9,7 +9,16 @@ use Pop\Http\Response;
 class IndexController extends AbstractController
 {
 
+    /**
+     * Request object
+     * @var Request
+     */
     protected $request  = null;
+
+    /**
+     * Response object
+     * @var Response
+     */
     protected $response = null;
 
     public function __construct()
