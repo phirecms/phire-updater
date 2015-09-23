@@ -104,10 +104,12 @@ class IndexController extends AbstractController
                 switch ($resource) {
                     case 'phirecms':
                         $ftp->put('phirecms.zip', __DIR__ . '/../../public/releases/phire/phirecms.zip');
+                        $ftp->chmod('phirecms.zip', 0777);
                         break;
                     default:
                         if (file_exists(__DIR__ . '/../../public/releases/modules/' . $resource . '.zip')) {
                             $ftp->put($resource . '.zip', __DIR__ . '/../../public/releases/modules/' . $resource . '.zip');
+                            $ftp->chmod($resource . '.zip', 0777);
                         }
                 }
                 $this->response->setBody(json_encode(['message' => 'Successful transfer.'], JSON_PRETTY_PRINT));
