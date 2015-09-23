@@ -80,13 +80,13 @@ class IndexController extends AbstractController
                 $ftp->pasv($data['pasv']);
 
                 if (!empty($data['root'])) {
-                    $ftp->chdir($ftp['root']);
+                    $ftp->chdir($data['root']);
                 }
                 if (!empty($data['base_path'])) {
-                    $ftp->chdir($ftp['base_path']);
+                    $ftp->chdir($data['base_path']);
                 }
                 if (!empty($data['content_path'])) {
-                    $ftp->chdir($ftp['content_path']);
+                    $ftp->chdir($data['content_path']);
                 }
 
                 switch ($resource) {
