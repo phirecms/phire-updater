@@ -14,9 +14,14 @@ $pop->get('/latest/:resource', [
     'action'     => 'latest'
 ]);
 
-$pop->post('/fetch', [
+$pop->post('/fetch/:resource', [
     'controller' => 'Phire\Updater\Controller\IndexController',
     'action'     => 'fetch'
+]);
+
+$pop->post('/test', [
+    'controller' => 'Phire\Updater\Controller\IndexController',
+    'action'     => 'test'
 ]);
 
 $pop->get('*', [
