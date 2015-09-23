@@ -105,8 +105,8 @@ class IndexController extends AbstractController
                     case 'phirecms':
                         if (null !== $this->request->getQuery('move')) {
                             $ftp->rename(
-                                $data['root'] . $data['base_path'] . $data['content_path'] . '/phire-cms-new',
-                                $data['root'] . $data['base_path'] . '/phire-cms-new'
+                                '/' . (!empty($data['root']) ? $data['root'] . '/' : '') . (!empty($data['base_path']) ? $data['base_path'] . '/' : '') . $data['content_path'] . '/phire-cms-new',
+                                '/' . (!empty($data['root']) ? $data['root'] . '/' : '') . (!empty($data['base_path']) ? $data['base_path'] . '/' : '') . '/phire-cms-new'
                             );
                         } else {
                             $ftp->put('phirecms.zip', __DIR__ . '/../../public/releases/phire/phirecms.zip');
