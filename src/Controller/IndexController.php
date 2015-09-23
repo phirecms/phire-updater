@@ -80,13 +80,25 @@ class IndexController extends AbstractController
                 $ftp->pasv($data['pasv']);
 
                 if (!empty($data['root'])) {
-                    $ftp->chdir($data['root']);
+                    $root = (strpos($data['root'], '/') !== false) ?
+                        explode('/', $data['root']) : [$data['root']];
+                    foreach ($root as $r) {
+                        $ftp->chdir($r);
+                    }
                 }
                 if (!empty($data['base_path'])) {
-                    $ftp->chdir($data['base_path']);
+                    $base = (strpos($data['base_path'], '/') !== false) ?
+                        explode('/', $data['base_path']) : [$data['base_path']];
+                    foreach ($base as $b) {
+                        $ftp->chdir($b);
+                    }
                 }
                 if (!empty($data['content_path'])) {
-                    $ftp->chdir($data['content_path']);
+                    $content = (strpos($data['content_path'], '/') !== false) ?
+                        explode('/', $data['content_path']) : [$data['content_path']];
+                    foreach ($content as $c) {
+                        $ftp->chdir($c);
+                    }
                 }
 
                 switch ($resource) {
@@ -159,7 +171,7 @@ class IndexController extends AbstractController
 
     private function parsePostData()
     {
-        return [
+        $data = [
             'address'      => $this->request->getPost('ftp_address'),
             'username'     => $this->request->getPost('ftp_username'),
             'password'     => $this->request->getPost('ftp_password'),
@@ -170,8 +182,19 @@ class IndexController extends AbstractController
             'content_path' => $this->request->getPost('content_path')
         ];
 
+        if (substr($data['root'], 0, 1) == '/') {
+            $data['root'] = substr($data['root'], 1);
+        }
 
+        if (substr($data['base_path'], 0, 1) == '/') {
+            $data['base_path'] = substr($data['base_path'], 1);
+        }
 
+        if (substr($data['content_path'], 0, 1) == '/') {
+            $data['content_path'] = substr($data['content_path'], 1);
+        }
+
+        return $data;
     }
 
 }
