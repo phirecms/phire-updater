@@ -103,8 +103,15 @@ class IndexController extends AbstractController
 
                 switch ($resource) {
                     case 'phirecms':
-                        $ftp->put('phirecms.zip', __DIR__ . '/../../public/releases/phire/phirecms.zip');
-                        $ftp->chmod('phirecms.zip', 0777);
+                        if (null !== $this->request->getQuery('move')) {
+                            $ftp->rename(
+                                $data['root'] . $data['base_path'] . $data['content_path'] . '/phire-cms-new',
+                                $data['root'] . $data['base_path'] . '/phire-cms-new'
+                            );
+                        } else {
+                            $ftp->put('phirecms.zip', __DIR__ . '/../../public/releases/phire/phirecms.zip');
+                            $ftp->chmod('phirecms.zip', 0777);
+                        }
                         break;
                     default:
                         if (file_exists(__DIR__ . '/../../public/releases/modules/' . $resource . '.zip')) {
