@@ -73,7 +73,7 @@ class IndexController extends AbstractController
 
     public function fetch($resource)
     {
-        if ($this->isValidRequest() && $this->isValidPostData($this->request->getPost())) {
+        if ($this->isValidPostData($this->request->getPost())) {
             $data = $this->parsePostData();
             try {
                 $ftp = new Ftp($data['address'], $data['username'], $data['password'], $data['ssl']);
@@ -111,14 +111,18 @@ class IndexController extends AbstractController
 
     public function test()
     {
-        $data = $this->parsePostData();
-        try {
-            $ftp = new Ftp($data['address'], $data['username'], $data['password'], $data['ssl']);
-            $this->response->setBody(json_encode(['message' => 'Successful test to the FTP server.'], JSON_PRETTY_PRINT));
-            $this->response->send(200);
-        } catch (\Exception $e) {
-            $this->response->setBody(json_encode(['error' => $e->getMessage()], JSON_PRETTY_PRINT));
-            $this->response->send(401);
+        if ($this->isValidPostData($this->request->getPost())) {
+            $data = $this->parsePostData();
+            try {
+                $ftp = new Ftp($data['address'], $data['username'], $data['password'], $data['ssl']);
+                $this->response->setBody(json_encode(['message' => 'Successful test to the FTP server.'], JSON_PRETTY_PRINT));
+                $this->response->send(200);
+            } catch (\Exception $e) {
+                $this->response->setBody(json_encode(['error' => $e->getMessage()], JSON_PRETTY_PRINT));
+                $this->response->send(401);
+            }
+        } else {
+            $this->error();
         }
     }
 
