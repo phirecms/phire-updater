@@ -79,43 +79,20 @@ class IndexController extends AbstractController
                 $ftp = new Ftp($data['address'], $data['username'], $data['password'], $data['ssl']);
                 $ftp->pasv($data['pasv']);
 
-                if (!empty($data['root'])) {
-                    $root = (strpos($data['root'], '/') !== false) ?
-                        explode('/', $data['root']) : [$data['root']];
-                    foreach ($root as $r) {
-                        $ftp->chdir($r);
-                    }
-                }
-                if (!empty($data['base_path'])) {
-                    $base = (strpos($data['base_path'], '/') !== false) ?
-                        explode('/', $data['base_path']) : [$data['base_path']];
-                    foreach ($base as $b) {
-                        $ftp->chdir($b);
-                    }
-                }
-                if (!empty($data['content_path'])) {
-                    $content = (strpos($data['content_path'], '/') !== false) ?
-                        explode('/', $data['content_path']) : [$data['content_path']];
-                    foreach ($content as $c) {
-                        $ftp->chdir($c);
-                    }
-                }
-
                 switch ($resource) {
                     case 'phirecms':
-                        if (null !== $this->request->getQuery('move')) {
-                            $dir = '/' . (!empty($data['root']) ? $data['root'] . '/' : '') . (!empty($data['base_path']) ? $data['base_path'] . '/' : '');
-                            $ftp->rename($dir . $data['content_path'] . '/phire-cms-new', $dir . 'phire-cms-new');
-                            $ftp->rename($dir . 'phire-cms', $dir . 'phire-cms-'. time());
-                            $ftp->rename($dir . 'phire-cms-new', $dir . 'phire-cms');
-                        } else {
-                            $ftp->put('phirecms.zip', __DIR__ . '/../../public/releases/phire/phirecms.zip');
-                            $ftp->chmod('phirecms.zip', 0777);
+                        if (file_exists(__DIR__ . '/../../public/releases/phire/phire.json')) {
+                            $files  = json_decode(file_get_contents(__DIR__ . '/../../public/releases/phire/phire.json'), true);
+                            $remote = $data['root'] . $data['base_path'] . $data['app_path'] . '/';
+                            foreach ($files as $file) {
+                                $ftp->put($remote . $file, __DIR__ . '/../../public/releases/phire/phire-cms/' . $file);
+                            }
                         }
                         break;
                     default:
-                        if (file_exists(__DIR__ . '/../../public/releases/modules/' . $resource . '.zip')) {
-                            $ftp->put($resource . '.zip', __DIR__ . '/../../public/releases/modules/' . $resource . '.zip');
+                        if (file_exists(__DIR__ . '/../../public/releases/modules/' . $resource . '.zip') && !empty($data['content_path'])) {
+                            $remote = $data['root'] . $data['base_path'] . $data['content_path'] . '/modules/';
+                            $ftp->put($remote . $resource . '.zip', __DIR__ . '/../../public/releases/modules/' . $resource . '.zip');
                             $ftp->chmod($resource . '.zip', 0777);
                         }
                 }
@@ -175,7 +152,7 @@ class IndexController extends AbstractController
     private function isValidPostData($post)
     {
         return (isset($post['ftp_address']) && isset($post['ftp_username']) && isset($post['ftp_password']) &&
-            isset($post['base_path']) && isset($post['content_path']));
+            isset($post['base_path']) && isset($post['app_path']) && isset($post['content_path']));
     }
 
     private function parsePostData()
@@ -188,20 +165,9 @@ class IndexController extends AbstractController
             'pasv'         => (bool)$this->request->getPost('use_pasv'),
             'ssl'          => (bool)$this->request->getPost('protocol'),
             'base_path'    => $this->request->getPost('base_path'),
+            'app_path'     => $this->request->getPost('app_path'),
             'content_path' => $this->request->getPost('content_path')
         ];
-
-        if (substr($data['root'], 0, 1) == '/') {
-            $data['root'] = substr($data['root'], 1);
-        }
-
-        if (substr($data['base_path'], 0, 1) == '/') {
-            $data['base_path'] = substr($data['base_path'], 1);
-        }
-
-        if (substr($data['content_path'], 0, 1) == '/') {
-            $data['content_path'] = substr($data['content_path'], 1);
-        }
 
         return $data;
     }
