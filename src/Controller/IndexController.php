@@ -84,15 +84,10 @@ class IndexController extends AbstractController
                         if (file_exists(__DIR__ . '/../../public/releases/phire/phire.json')) {
                             $files  = json_decode(file_get_contents(__DIR__ . '/../../public/releases/phire/phire.json'), true);
                             $remote = $data['root'] . $data['base_path'] . $data['app_path'] . '/';
-                            $check  = 'ftp://' . $data['username'] . ':'  . $data['password'] . '@' .$data['address'] . $remote;
                             foreach ($files as $file) {
-                                if (strpos($file, '/') !== false) {
-                                    $checkFile = fopen($check . $file, 'r');
-                                    if ($checkFile === false) {
-                                        $dirs = substr($file, 0, strrpos($file, '/'));
-                                        $ftp->mkdirs($dirs);
-                                    }
-                                    fclose($checkFile);
+                                $dir = dirname($file);
+                                if (!$ftp->dirExists($remote . $dir)) {
+                                    $ftp->mkdirs($remote . $dir);
                                 }
                                 $ftp->put($remote . $file, __DIR__ . '/../../public/releases/phire/phire-cms/' . $file);
                             }
