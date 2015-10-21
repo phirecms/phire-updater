@@ -55,7 +55,10 @@ class IndexController extends AbstractController
                     $json['version']  = $updates['phirecms'];
                     break;
                 default:
-                    if (isset($updates['modules'][$resource])) {
+                    if (($this->request->getQuery('theme') == 1) && isset($updates['themes'][$resource])) {
+                        $json['resource'] = $resource;
+                        $json['version']  = $updates['themes'][$resource];
+                    } else if (isset($updates['modules'][$resource])) {
                         $json['resource'] = $resource;
                         $json['version']  = $updates['modules'][$resource];
                     } else {

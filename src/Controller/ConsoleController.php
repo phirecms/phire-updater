@@ -27,7 +27,8 @@ class ConsoleController extends AbstractController
      */
     protected $current = [
         'phirecms' => '',
-        'modules'  => []
+        'modules'  => [],
+        'themes'   => []
     ];
 
     /**
@@ -36,7 +37,8 @@ class ConsoleController extends AbstractController
      */
     protected $json = [
         'phirecms' => '',
-        'modules'  => []
+        'modules'  => [],
+        'themes'   => []
     ];
 
     /**
@@ -119,6 +121,10 @@ class ConsoleController extends AbstractController
             } else {
                 $this->console->write(' ' . $this->console->colorize('Error', Console::BOLD_RED) . '.');
             }
+        }
+
+        if (isset($this->current['themes'])) {
+            $this->json['themes'] = $this->current['themes'];
         }
 
         // Write new 'updates.json' file
