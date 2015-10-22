@@ -1,5 +1,5 @@
 {
-    "phirecms": "2.0.0rc1",
+    "phirecms": "2.0.0",
     "modules": {
         "phire-cache": "1.0",
         "phire-calendar": "1.0",
