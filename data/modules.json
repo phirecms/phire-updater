@@ -20,5 +20,6 @@
     "phire-sitemap",
     "phire-tags",
     "phire-templates",
-    "phire-themes"
+    "phire-themes",
+    "phire-views"
 ]
