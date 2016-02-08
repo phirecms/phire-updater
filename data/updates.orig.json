@@ -3,7 +3,6 @@
     "modules": {
         "phire-cache": "1.0",
         "phire-calendar": "1.0",
-        "phire-campaigns": "1.0",
         "phire-captcha": "1.0",
         "phire-categories": "1.0",
         "phire-clicktrack": "1.0",
@@ -16,7 +15,6 @@
         "phire-media": "1.0",
         "phire-members": "1.0",
         "phire-navigation": "1.0",
-        "phire-reviews": "1.0",
         "phire-search": "1.0",
         "phire-sessions": "1.0",
         "phire-sitemap": "1.0",

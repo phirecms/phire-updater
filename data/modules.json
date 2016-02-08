@@ -1,7 +1,6 @@
 [
     "phire-cache",
     "phire-calendar",
-    "phire-campaigns",
     "phire-captcha",
     "phire-categories",
     "phire-clicktrack",
@@ -14,7 +13,6 @@
     "phire-media",
     "phire-members",
     "phire-navigation",
-    "phire-reviews",
     "phire-search",
     "phire-sessions",
     "phire-sitemap",
