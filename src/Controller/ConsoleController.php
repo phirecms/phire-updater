@@ -46,7 +46,9 @@ class ConsoleController extends AbstractController
      * @var array
      */
     protected $options = [
-        CURLOPT_HTTPHEADER => ['User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:40.0) Gecko/20100101 Firefox/40.0']
+        CURLOPT_HTTPHEADER => [
+            'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:40.0) Gecko/20100101 Firefox/40.0'
+        ]
     ];
 
     /**
@@ -56,8 +58,20 @@ class ConsoleController extends AbstractController
     protected $urls = [
         'phirecms' => 'https://api.github.com/repos/phirecms/phirecms/releases/latest',
         'module'   => 'https://api.github.com/repos/phirecms/[{module}]/releases/latest',
-        'file'     => 'https://github.com/phirecms/[{module}]/blob/master/[{module}].zip?raw=true'
+        'file'     => 'https://github.com/phirecms/[{module}]/archive/[{tag_name}].zip'
     ];
+
+    /**
+     * Client ID
+     * @var string
+     */
+    protected $clientId = 'xxxx';
+
+    /**
+     * Client Secret
+     * @var string
+     */
+    protected $clientSecret = 'yyyy';
 
     public function __construct()
     {
@@ -76,7 +90,8 @@ class ConsoleController extends AbstractController
         );
 
         // Get latest version of phirecms
-        $curl = new Curl($this->urls['phirecms'], $this->options);
+        $url =  $this->urls['phirecms'] . '?client_id=' . $this->clientId .'&client_secret=' . $this->clientSecret;
+        $curl = new Curl($url, $this->options);
         $curl->send();
 
         if ($curl->getCode() == 200) {
@@ -94,38 +109,40 @@ class ConsoleController extends AbstractController
                 '    Fetching: ' . $this->console->colorize($module, Console::BOLD_CYAN) . '...', false
             );
 
-            $url  = str_replace('[{module}]', $module, $this->urls['module']);
+            $url  = str_replace('[{module}]', $module, $this->urls['module']) .
+                '?client_id=' . $this->clientId .'&client_secret=' . $this->clientSecret;
             $curl = new Curl($url, $this->options);
             $curl->send();
 
             if ($curl->getCode() == 200) {
                 $body = json_decode($curl->getBody(), true);
-                $this->json['modules'][$module] = (isset($body['tag_name'])) ? $body['tag_name'] : '';
+                if (isset($body['tag_name'])) {
+                    $this->json['modules'][$module] = $body['tag_name'];
 
-                // Get file
-                if (!isset($this->current['modules'][$module]) || (isset($this->current['modules'][$module]) &&
-                    (version_compare($this->current['modules'][$module], $this->json['modules'][$module]) < 0))) {
-                    $this->console->write(' Downloading...', false);
+                    // Get file
+                    if (!isset($this->current['modules'][$module]) || (isset($this->current['modules'][$module]) &&
+                        (version_compare($this->current['modules'][$module], $this->json['modules'][$module]) < 0))) {
+                        $this->console->write(' Downloading...', false);
 
-                    if (file_exists(__DIR__ . '/../../public/releases/modules/' . $module . '.zip')) {
-                        unlink(__DIR__ . '/../../public/releases/modules/' . $module . '.zip');
+                        if (file_exists(__DIR__ . '/../../public/releases/modules/' . $module . '.zip')) {
+                            unlink(__DIR__ . '/../../public/releases/modules/' . $module . '.zip');
+                        }
+                        $file = str_replace(['[{module}]', '[{tag_name}]'], [$module, $body['tag_name']], $this->urls['file']);
+                        file_put_contents(
+                            __DIR__ . '/../../public/releases/modules/' . $module . '-' . $body['tag_name'] . '.zip',
+                            file_get_contents($file)
+                        );
                     }
-                    $file = str_replace('[{module}]', $module, $this->urls['file']);
-                    file_put_contents(
-                        __DIR__ . '/../../public/releases/modules/' . $module . '.zip',
-                        file_get_contents($file)
-                    );
+                    $this->console->write(' Complete.');
                 }
-
-                $this->console->write(' Complete.');
             } else {
                 $this->console->write(' ' . $this->console->colorize('Error', Console::BOLD_RED) . '.');
             }
         }
 
-        if (isset($this->current['themes'])) {
-            $this->json['themes'] = $this->current['themes'];
-        }
+        //if (isset($this->current['themes'])) {
+        //    $this->json['themes'] = $this->current['themes'];
+        //}
 
         // Write new 'updates.json' file
         if (file_exists(__DIR__ . '/../../data/updates.json')) {
