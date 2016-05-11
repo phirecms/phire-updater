@@ -58,7 +58,8 @@ class ConsoleController extends AbstractController
     protected $urls = [
         'phirecms' => 'https://api.github.com/repos/phirecms/phirecms/releases/latest',
         'module'   => 'https://api.github.com/repos/phirecms/[{module}]/releases/latest',
-        'file'     => 'https://github.com/phirecms/[{module}]/archive/[{tag_name}].zip'
+        'theme'    => 'https://api.github.com/repos/phirecms/[{theme}]/releases/latest',
+        'file'     => 'https://github.com/phirecms/[{file}]/archive/[{tag_name}].zip'
     ];
 
     /**
@@ -77,6 +78,7 @@ class ConsoleController extends AbstractController
     {
         $this->console = new Console();
         $this->modules = json_decode(file_get_contents(__DIR__ . '/../../data/modules.json'), true);
+        $this->themes  = json_decode(file_get_contents(__DIR__ . '/../../data/themes.json'), true);
         if (file_exists(__DIR__ . '/../../data/updates.json')) {
             $this->current = json_decode(file_get_contents(__DIR__ . '/../../data/updates.json'), true);
         }
@@ -127,7 +129,7 @@ class ConsoleController extends AbstractController
                         if (file_exists(__DIR__ . '/../../public/releases/modules/' . $module . '.zip')) {
                             unlink(__DIR__ . '/../../public/releases/modules/' . $module . '.zip');
                         }
-                        $file = str_replace(['[{module}]', '[{tag_name}]'], [$module, $body['tag_name']], $this->urls['file']);
+                        $file = str_replace(['[{file}]', '[{tag_name}]'], [$module, $body['tag_name']], $this->urls['file']);
                         file_put_contents(
                             __DIR__ . '/../../public/releases/modules/' . $module . '-' . $body['tag_name'] . '.zip',
                             file_get_contents($file)
@@ -140,9 +142,45 @@ class ConsoleController extends AbstractController
             }
         }
 
-        //if (isset($this->current['themes'])) {
-        //    $this->json['themes'] = $this->current['themes'];
-        //}
+        $this->console->write();
+
+        // Get latest versions of themes
+        foreach ($this->themes as $theme) {
+            // Get version
+            $this->console->write(
+                '    Fetching: ' . $this->console->colorize($theme, Console::BOLD_CYAN) . '...', false
+            );
+
+            $url  = str_replace('[{theme}]', $theme, $this->urls['theme']) .
+                '?client_id=' . $this->clientId .'&client_secret=' . $this->clientSecret;
+            $curl = new Curl($url, $this->options);
+            $curl->send();
+
+            if ($curl->getCode() == 200) {
+                $body = json_decode($curl->getBody(), true);
+                if (isset($body['tag_name'])) {
+                    $this->json['themes'][$theme] = $body['tag_name'];
+
+                    // Get file
+                    if (!isset($this->current['themes'][$theme]) || (isset($this->current['themes'][$theme]) &&
+                            (version_compare($this->current['themes'][$theme], $this->json['themes'][$theme]) < 0))) {
+                        $this->console->write(' Downloading...', false);
+
+                        if (file_exists(__DIR__ . '/../../public/releases/themes/' . $theme . '.zip')) {
+                            unlink(__DIR__ . '/../../public/releases/themes/' . $theme . '.zip');
+                        }
+                        $file = str_replace(['[{file}]', '[{tag_name}]'], [$theme, $body['tag_name']], $this->urls['file']);
+                        file_put_contents(
+                            __DIR__ . '/../../public/releases/themes/' . $theme . '-' . $body['tag_name'] . '.zip',
+                            file_get_contents($file)
+                        );
+                    }
+                    $this->console->write(' Complete.');
+                }
+            } else {
+                $this->console->write(' ' . $this->console->colorize('Error', Console::BOLD_RED) . '.');
+            }
+        }
 
         // Write new 'updates.json' file
         if (file_exists(__DIR__ . '/../../data/updates.json')) {

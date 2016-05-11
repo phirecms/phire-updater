@@ -28,6 +28,6 @@
         "phire-views": "1.0"
     },
     "themes": {
-        "default": "1.0"
+        "default-theme": "1.0"
     }
 }

@@ -97,7 +97,12 @@ class IndexController extends AbstractController
                         }
                         break;
                     default:
-                        if (file_exists(__DIR__ . '/../../public/releases/modules/' . $resource . '.zip') && !empty($data['content_path'])) {
+                        if (($this->request->getQuery('theme') == 1) &&
+                            file_exists(__DIR__ . '/../../public/releases/themes/' . $resource . '.zip') && !empty($data['content_path'])) {
+                            $remote = $data['root'] . $data['base_path'] . $data['content_path'] . '/themes/';
+                            $ftp->put($remote . $resource . '.zip', __DIR__ . '/../../public/releases/themes/' . $resource . '.zip');
+                            $ftp->chmod($resource . '.zip', 0777);
+                        } else if (file_exists(__DIR__ . '/../../public/releases/modules/' . $resource . '.zip') && !empty($data['content_path'])) {
                             $remote = $data['root'] . $data['base_path'] . $data['content_path'] . '/modules/';
                             $ftp->put($remote . $resource . '.zip', __DIR__ . '/../../public/releases/modules/' . $resource . '.zip');
                             $ftp->chmod($resource . '.zip', 0777);
