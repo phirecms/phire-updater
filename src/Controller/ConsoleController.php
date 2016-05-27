@@ -1,11 +1,32 @@
 <?php
+/**
+ * Phire Updater Application
+ *
+ * @link       https://github.com/phirecms/phire-updater
+ * @author     Nick Sagona, III <dev@nolainteractive.com>
+ * @copyright  Copyright (c) 2009-2016 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @license    http://www.phirecms.org/license     New BSD License
+ */
 
+/**
+ * @namespace
+ */
 namespace Phire\Updater\Controller;
 
 use Pop\Controller\AbstractController;
 use Pop\Console\Console;
 use Pop\Http\Client\Curl;
 
+/**
+ * Updater Console Controller class
+ *
+ * @category   Phire\Updater
+ * @package    Phire\Updater
+ * @author     Nick Sagona, III <dev@nolainteractive.com>
+ * @copyright  Copyright (c) 2009-2016 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @license    http://www.phirecms.org/license     New BSD License
+ * @version    1.0.0
+ */
 class ConsoleController extends AbstractController
 {
 
