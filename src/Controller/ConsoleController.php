@@ -161,6 +161,7 @@ class ConsoleController extends AbstractController
                             __DIR__ . '/../../public/releases/modules/' . $module . '-' . $body['tag_name'] . '.zip',
                             file_get_contents($file)
                         );
+                        chmod(__DIR__ . '/../../public/releases/modules/' . $module . '-' . $body['tag_name'] . '.zip', 0777);
                     }
                     $this->console->write(' Complete.');
                 }
@@ -201,6 +202,7 @@ class ConsoleController extends AbstractController
                             __DIR__ . '/../../public/releases/themes/' . $theme . '-' . $body['tag_name'] . '.zip',
                             file_get_contents($file)
                         );
+                        chmod(__DIR__ . '/../../public/releases/themes/' . $theme . '-' . $body['tag_name'] . '.zip', 0777);
                     }
                     $this->console->write(' Complete.');
                 }
