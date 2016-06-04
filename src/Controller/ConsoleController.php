@@ -37,10 +37,16 @@ class ConsoleController extends AbstractController
     protected $console = null;
 
     /**
-     * Parse modules
+     * Parsed modules
      * @var array
      */
     protected $modules = [];
+
+    /**
+     * Parsed themes
+     * @var array
+     */
+    protected $themes = [];
 
     /**
      * Current version data

@@ -28,6 +28,8 @@
         "phire-views": "1.0"
     },
     "themes": {
-        "default-theme": "1.0"
+        "carousel-theme": "1.0",
+        "jumbotron-theme": "1.0",
+        "parallax-theme": "1.0"
     }
 }
